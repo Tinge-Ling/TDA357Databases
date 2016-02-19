@@ -1,0 +1,1151 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.2.14
+-- Dumped by pg_dump version 9.5.0
+
+-- Started on 2016-02-19 22:53:38 CET
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 191 (class 3079 OID 12648)
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- TOC entry 3019 (class 0 OID 0)
+-- Dependencies: 191
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = tda357;
+
+SET default_with_oids = false;
+
+--
+-- TOC entry 170 (class 1259 OID 61475)
+-- Name: branch; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE branch (
+    spname character varying(100) NOT NULL,
+    name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE branch OWNER TO tda357_049;
+
+--
+-- TOC entry 174 (class 1259 OID 61573)
+-- Name: classification; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE classification (
+    name character varying(30) NOT NULL
+);
+
+
+ALTER TABLE classification OWNER TO tda357_049;
+
+--
+-- TOC entry 171 (class 1259 OID 61485)
+-- Name: course; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE course (
+    coursename character varying(40) NOT NULL,
+    creditpoints real NOT NULL,
+    code character(6) NOT NULL,
+    departabb character varying(5),
+    CONSTRAINT validcreditpoints CHECK ((creditpoints > (0)::double precision))
+);
+
+
+ALTER TABLE course OWNER TO tda357_049;
+
+--
+-- TOC entry 169 (class 1259 OID 61464)
+-- Name: department; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE department (
+    name character varying(100) NOT NULL,
+    abbreviation character varying(5) NOT NULL
+);
+
+
+ALTER TABLE department OWNER TO tda357_049;
+
+--
+-- TOC entry 179 (class 1259 OID 62118)
+-- Name: hascompleted; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE hascompleted (
+    grade character(1),
+    coursecode character(10) NOT NULL,
+    studentid character(10) NOT NULL,
+    CONSTRAINT validgrade CHECK ((grade = ANY (ARRAY['U'::bpchar, '3'::bpchar, '4'::bpchar, '5'::bpchar])))
+);
+
+
+ALTER TABLE hascompleted OWNER TO tda357_049;
+
+--
+-- TOC entry 173 (class 1259 OID 61508)
+-- Name: student; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE student (
+    name character varying(40) NOT NULL,
+    id character(10) NOT NULL,
+    spname character varying(40)
+);
+
+
+ALTER TABLE student OWNER TO tda357_049;
+
+--
+-- TOC entry 186 (class 1259 OID 232674)
+-- Name: finishedcourses; Type: VIEW; Schema: public; Owner: tda357_049
+--
+
+CREATE VIEW finishedcourses AS
+SELECT student.name, hascompleted.grade, hascompleted.coursecode, course.creditpoints, student.id FROM ((hascompleted LEFT JOIN student ON ((student.id = hascompleted.studentid))) JOIN course ON ((hascompleted.coursecode = course.code)));
+
+
+ALTER TABLE finishedcourses OWNER TO tda357_049;
+
+--
+-- TOC entry 183 (class 1259 OID 216519)
+-- Name: hasbranch; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE hasbranch (
+    studentid character(10) NOT NULL,
+    bname character varying(40),
+    bprogramme character varying(40)
+);
+
+
+ALTER TABLE hasbranch OWNER TO tda357_049;
+
+--
+-- TOC entry 181 (class 1259 OID 62213)
+-- Name: hasclassification; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE hasclassification (
+    coursecode character(6) NOT NULL,
+    classname character varying(30) NOT NULL
+);
+
+
+ALTER TABLE hasclassification OWNER TO tda357_049;
+
+--
+-- TOC entry 175 (class 1259 OID 61614)
+-- Name: hostby; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE hostby (
+    dabbreviation character varying(5) NOT NULL,
+    spname character varying(40) NOT NULL
+);
+
+
+ALTER TABLE hostby OWNER TO tda357_049;
+
+--
+-- TOC entry 177 (class 1259 OID 62070)
+-- Name: isaddmandatory; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE isaddmandatory (
+    coursecode character(6) NOT NULL,
+    bprogramme character varying(100) NOT NULL,
+    bname character varying(100) NOT NULL
+);
+
+
+ALTER TABLE isaddmandatory OWNER TO tda357_049;
+
+--
+-- TOC entry 176 (class 1259 OID 62025)
+-- Name: ismandatory; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE ismandatory (
+    coursecode character(6) NOT NULL,
+    spname character varying(40) NOT NULL
+);
+
+
+ALTER TABLE ismandatory OWNER TO tda357_049;
+
+--
+-- TOC entry 182 (class 1259 OID 215432)
+-- Name: isprerequisite; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE isprerequisite (
+    coursecode character(6) NOT NULL,
+    prereq character(6) NOT NULL
+);
+
+
+ALTER TABLE isprerequisite OWNER TO tda357_049;
+
+--
+-- TOC entry 188 (class 1259 OID 385923)
+-- Name: isrecommended; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE isrecommended (
+    coursecode character(6) NOT NULL,
+    bprogramme character varying(100) NOT NULL,
+    bname character varying(100) NOT NULL
+);
+
+
+ALTER TABLE isrecommended OWNER TO tda357_049;
+
+--
+-- TOC entry 178 (class 1259 OID 62085)
+-- Name: isregistered; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE isregistered (
+    coursecode character(6) NOT NULL,
+    studentid character(10) NOT NULL
+);
+
+
+ALTER TABLE isregistered OWNER TO tda357_049;
+
+--
+-- TOC entry 180 (class 1259 OID 62198)
+-- Name: iswaiting; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE iswaiting (
+    sincedate date,
+    studentid character(10) NOT NULL,
+    coursecode character(6) NOT NULL
+);
+
+
+ALTER TABLE iswaiting OWNER TO tda357_049;
+
+--
+-- TOC entry 172 (class 1259 OID 61497)
+-- Name: limitedcourse; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE limitedcourse (
+    coursecode character(6) NOT NULL,
+    maxparticipants integer,
+    CONSTRAINT validparticipants CHECK ((maxparticipants > 0))
+);
+
+
+ALTER TABLE limitedcourse OWNER TO tda357_049;
+
+--
+-- TOC entry 187 (class 1259 OID 234502)
+-- Name: passedcourses; Type: VIEW; Schema: public; Owner: tda357_049
+--
+
+CREATE VIEW passedcourses AS
+SELECT finishedcourses.name, finishedcourses.grade, finishedcourses.coursecode, finishedcourses.creditpoints, finishedcourses.id FROM finishedcourses WHERE (finishedcourses.grade <> 'U'::bpchar);
+
+
+ALTER TABLE passedcourses OWNER TO tda357_049;
+
+--
+-- TOC entry 184 (class 1259 OID 228787)
+-- Name: studentsfollowing; Type: VIEW; Schema: public; Owner: tda357_049
+--
+
+CREATE VIEW studentsfollowing AS
+SELECT student.id, student.name, student.spname, hasbranch.bname FROM (student LEFT JOIN hasbranch ON ((student.id = hasbranch.studentid)));
+
+
+ALTER TABLE studentsfollowing OWNER TO tda357_049;
+
+--
+-- TOC entry 189 (class 1259 OID 395524)
+-- Name: unreadmandatory; Type: VIEW; Schema: public; Owner: tda357_049
+--
+
+CREATE VIEW unreadmandatory AS
+SELECT student.id, student.name, student.spname, hasbranch.bname, ismandatory.coursecode, hascompleted.grade FROM ((((student JOIN ismandatory ON (((student.spname)::text = (ismandatory.spname)::text))) JOIN course ON ((ismandatory.coursecode = course.code))) LEFT JOIN hasbranch ON ((student.id = hasbranch.studentid))) LEFT JOIN hascompleted ON (((student.id = hascompleted.studentid) AND (ismandatory.coursecode = hascompleted.coursecode)))) WHERE ((hascompleted.grade IS NULL) OR (hascompleted.grade = 'U'::bpchar)) UNION SELECT student.id, student.name, hasbranch.bprogramme AS spname, hasbranch.bname, course.code AS coursecode, hascompleted.grade FROM ((((student JOIN hasbranch ON ((student.id = hasbranch.studentid))) JOIN isaddmandatory ON ((((isaddmandatory.bname)::text = (hasbranch.bname)::text) AND ((isaddmandatory.bprogramme)::text = (hasbranch.bprogramme)::text)))) JOIN course ON ((course.code = isaddmandatory.coursecode))) LEFT JOIN hascompleted ON (((hasbranch.studentid = hascompleted.studentid) AND (isaddmandatory.coursecode = hascompleted.coursecode)))) WHERE ((hascompleted.grade IS NULL) OR (hascompleted.grade = 'U'::bpchar));
+
+
+ALTER TABLE unreadmandatory OWNER TO tda357_049;
+
+--
+-- TOC entry 190 (class 1259 OID 567348)
+-- Name: pathtograduation; Type: VIEW; Schema: public; Owner: tda357_049
+--
+
+CREATE VIEW pathtograduation AS
+SELECT p.id, p.name, COALESCE(cred.totalcreditpoints, (0)::real) AS totalcreditpoints, COALESCE(unman.unpassed_mandatory, (0)::bigint) AS unreadmandatorycourses, COALESCE(mathpoints.math_credits, (0)::real) AS mathcredits, COALESCE(respoints.res_credits, (0)::real) AS researchcredits, COALESCE(sem.nbrseminar, (0)::bigint) AS nbrofseminar, CASE WHEN (((((unman.unpassed_mandatory IS NULL) AND (mathpoints.math_credits >= (20)::double precision)) AND (respoints.res_credits >= (10)::double precision)) AND (sem.nbrseminar >= 1)) AND (recomcred.recompoints >= (10)::double precision)) THEN 'yes'::text ELSE 'no'::text END AS isqualifiedtograduate FROM ((((((studentsfollowing p NATURAL LEFT JOIN (SELECT passedcourses.id, sum(passedcourses.creditpoints) AS totalcreditpoints FROM passedcourses GROUP BY passedcourses.id) cred) NATURAL LEFT JOIN (SELECT unreadmandatory.id, count(unreadmandatory.coursecode) AS unpassed_mandatory FROM unreadmandatory GROUP BY unreadmandatory.id) unman) NATURAL LEFT JOIN (SELECT pc.id, sum(pc.creditpoints) AS math_credits FROM (passedcourses pc JOIN hasclassification hc ON ((pc.coursecode = hc.coursecode))) WHERE ((hc.classname)::text = 'Mathematics'::text) GROUP BY pc.id) mathpoints) NATURAL LEFT JOIN (SELECT pc.id, sum(pc.creditpoints) AS res_credits FROM (passedcourses pc JOIN hasclassification hc ON ((pc.coursecode = hc.coursecode))) WHERE ((hc.classname)::text = 'Research'::text) GROUP BY pc.id) respoints) NATURAL LEFT JOIN (SELECT pc.id, count(pc.coursecode) AS nbrseminar FROM (passedcourses pc JOIN hasclassification hc ON ((pc.coursecode = hc.coursecode))) WHERE ((hc.classname)::text = 'Seminar'::text) GROUP BY pc.id) sem) NATURAL LEFT JOIN (SELECT pc.id, sum(pc.creditpoints) AS recompoints FROM (passedcourses pc JOIN isrecommended ir ON ((pc.coursecode = ir.coursecode))) GROUP BY pc.id) recomcred);
+
+
+ALTER TABLE pathtograduation OWNER TO tda357_049;
+
+--
+-- TOC entry 185 (class 1259 OID 232246)
+-- Name: registrations; Type: VIEW; Schema: public; Owner: tda357_049
+--
+
+CREATE VIEW registrations AS
+SELECT isregistered.coursecode, isregistered.studentid, 'registered'::text AS status FROM isregistered UNION SELECT iswaiting.coursecode, iswaiting.studentid, 'waiting'::text AS status FROM iswaiting;
+
+
+ALTER TABLE registrations OWNER TO tda357_049;
+
+--
+-- TOC entry 168 (class 1259 OID 61269)
+-- Name: studyprogramme; Type: TABLE; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+CREATE TABLE studyprogramme (
+    name character varying(40) NOT NULL,
+    abbreviation character varying(5) NOT NULL
+);
+
+
+ALTER TABLE studyprogramme OWNER TO tda357_049;
+
+--
+-- TOC entry 2997 (class 0 OID 61475)
+-- Dependencies: 170
+-- Data for Name: branch; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO branch (spname, name) VALUES ('Information Technology', 'Interaction Design');
+INSERT INTO branch (spname, name) VALUES ('Society Technology', 'Sound and Vibration');
+INSERT INTO branch (spname, name) VALUES ('Society Technology', 'Design for Sustainable Development');
+INSERT INTO branch (spname, name) VALUES ('Industrial Technology', 'Design for Sustainable Development');
+INSERT INTO branch (spname, name) VALUES ('Industrial Technology', 'Product Development');
+INSERT INTO branch (spname, name) VALUES ('Marine', 'Maritime Management');
+INSERT INTO branch (spname, name) VALUES ('Naval Commander', 'Maritime Management');
+INSERT INTO branch (spname, name) VALUES ('Physics Engineer', 'Nanotechnology');
+INSERT INTO branch (spname, name) VALUES ('Physics Engineer', 'Applied Mechanics');
+INSERT INTO branch (spname, name) VALUES ('Mechanical', 'Applied Mechanics');
+INSERT INTO branch (spname, name) VALUES ('Mechanical', 'Automotive Engineering');
+INSERT INTO branch (spname, name) VALUES ('Mechanical', 'Materials Engineering');
+INSERT INTO branch (spname, name) VALUES ('Electronics Engineering', 'Sound and Vibration');
+INSERT INTO branch (spname, name) VALUES ('Electronics Engineering', 'Embedded Electronic System Design');
+INSERT INTO branch (spname, name) VALUES ('Information Technology', 'Entrepreneurship and Business Design');
+INSERT INTO branch (spname, name) VALUES ('Computer Science', 'Software Engineering ');
+INSERT INTO branch (spname, name) VALUES ('Computer Science', 'Computer Systems and Networks');
+INSERT INTO branch (spname, name) VALUES ('Chemistry Technology', 'Biotechnology');
+INSERT INTO branch (spname, name) VALUES ('Chemistry Technology', 'Industrial Ecology');
+INSERT INTO branch (spname, name) VALUES ('Architecture', 'Architecture and Urban Design');
+INSERT INTO branch (spname, name) VALUES ('Architecture', 'Design for Sustainable Development');
+INSERT INTO branch (spname, name) VALUES ('Information Technology', 'CS, Algorithms, Language and Logic');
+
+
+--
+-- TOC entry 3001 (class 0 OID 61573)
+-- Dependencies: 174
+-- Data for Name: classification; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO classification (name) VALUES ('Mathematics');
+INSERT INTO classification (name) VALUES ('Research');
+INSERT INTO classification (name) VALUES ('Physics');
+INSERT INTO classification (name) VALUES ('Chemistry');
+INSERT INTO classification (name) VALUES ('Environment');
+INSERT INTO classification (name) VALUES ('Programming');
+INSERT INTO classification (name) VALUES ('Music');
+INSERT INTO classification (name) VALUES ('Art');
+INSERT INTO classification (name) VALUES ('Biology');
+INSERT INTO classification (name) VALUES ('Leadership');
+INSERT INTO classification (name) VALUES ('Other');
+INSERT INTO classification (name) VALUES ('Seminar');
+
+
+--
+-- TOC entry 2998 (class 0 OID 61485)
+-- Dependencies: 171
+-- Data for Name: course; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Mathematics1', 7.5, 'TDA123', 'AT');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Mathematics Algebra', 7.5, 'TGF345', 'EDIT');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Discret Mathematic', 7.5, 'ASD341', 'F');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Sound 2', 7.5, 'TKG531', 'KBME');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Linear Algebra', 7.5, 'TKD092', 'AT');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Analysis', 7.5, 'MVA123', 'AT');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Relation and IT', 7.5, 'MVE052', 'EDIT');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Objective Programme', 7.5, 'MVV395', 'EDIT');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Objective Programming 2', 7.5, 'MVY853', 'EDIT');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Network 3', 3.5, 'KHU957', 'ME');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Databases', 3.5, 'DTG678', 'ME');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Databases and relation', 3.5, 'BAD431', 'OC');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('E-R diagram', 3.5, 'TLA124', 'OC');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Datastructure', 3.5, 'MBD923', 'OC');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Algoritmn', 3.5, 'TAS166', 'EDIT');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Physics', 3.5, 'TOA194', 'F');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Vibration', 3.5, 'VRT410', 'F');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Economy A', 3.5, 'AIC692', 'F');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('English', 4, 'AKR245', 'I');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Artificial Intelligence', 4, 'VMA581', 'I');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Programming project', 4, 'JKN852', 'I');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Sound1', 7.5, 'TKG431', 'KBME');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Network 1', 7.5, 'KHU958', 'EDIT');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Network 2', 7.5, 'KHU959', 'EDIT');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('English 2', 4, 'AKR246', 'F');
+INSERT INTO course (coursename, creditpoints, code, departabb) VALUES ('Statistics', 7.5, 'AER682', 'I');
+
+
+--
+-- TOC entry 2996 (class 0 OID 61464)
+-- Dependencies: 169
+-- Data for Name: department; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO department (name, abbreviation) VALUES ('Electronics, Computer Science, Information & Technology', 'EDIT');
+INSERT INTO department (name, abbreviation) VALUES ('Architecture, Construction Engeering', 'AT');
+INSERT INTO department (name, abbreviation) VALUES ('Chemistry AND Biomedical Engineering', 'KBME');
+INSERT INTO department (name, abbreviation) VALUES ('Mechanical Engineering', 'ME');
+INSERT INTO department (name, abbreviation) VALUES ('Industrial Engineering AND Economics', 'I');
+INSERT INTO department (name, abbreviation) VALUES ('Marine', 'OC');
+INSERT INTO department (name, abbreviation) VALUES ('Physics AND Mathematical Engineering', 'F');
+
+
+--
+-- TOC entry 3010 (class 0 OID 216519)
+-- Dependencies: 183
+-- Data for Name: hasbranch; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO hasbranch (studentid, bname, bprogramme) VALUES ('9505182270', 'Interaction Design', 'Information Technology');
+INSERT INTO hasbranch (studentid, bname, bprogramme) VALUES ('9411111121', 'Automotive Engineering', 'Mechanical');
+INSERT INTO hasbranch (studentid, bname, bprogramme) VALUES ('9405051262', 'Sound and Vibration', 'Electronics Engineering');
+INSERT INTO hasbranch (studentid, bname, bprogramme) VALUES ('9104021896', 'Sound and Vibration', 'Society Technology');
+INSERT INTO hasbranch (studentid, bname, bprogramme) VALUES ('9310052735', 'Design for Sustainable Development', 'Architecture');
+INSERT INTO hasbranch (studentid, bname, bprogramme) VALUES ('8512121212', 'Maritime Management', 'Naval Commander');
+
+
+--
+-- TOC entry 3008 (class 0 OID 62213)
+-- Dependencies: 181
+-- Data for Name: hasclassification; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO hasclassification (coursecode, classname) VALUES ('MVA123', 'Art');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('MVE052', 'Biology');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('KHU957', 'Chemistry');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('DTG678', 'Environment');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('BAD431', 'Art');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('TLA124', 'Environment');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('TOA194', 'Leadership');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('VRT410', 'Leadership');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('AER682', 'Music');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('JKN852', 'Music');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('TKD092', 'Physics');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('AKR245', 'Programming');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('VMA581', 'Programming');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('AER682', 'Research');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('JKN852', 'Research');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('TGF345', 'Mathematics');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('TKD092', 'Mathematics');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('MVV395', 'Seminar');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('MVY853', 'Seminar');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('TDA123', 'Seminar');
+INSERT INTO hasclassification (coursecode, classname) VALUES ('TDA123', 'Mathematics');
+
+
+--
+-- TOC entry 3006 (class 0 OID 62118)
+-- Dependencies: 179
+-- Data for Name: hascompleted; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'MVV395    ', '5407015273');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'TLA124    ', '7801126312');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'AKR245    ', '7801126312');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TKG531    ', '7601236413');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'ASD341    ', '9104021896');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'KHU957    ', '9104021896');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'KHU957    ', '8903128301');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'DTG678    ', '8903128301');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'DTG678    ', '5407015273');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'BAD431    ', '9306236412');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'BAD431    ', '9910222231');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'VRT410    ', '9402287512');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'VRT410    ', '9306236412');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'BAD431    ', '5407015273');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVE052    ', '9602072717');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVE052    ', '9409182432');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVY853    ', '9411111121');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'TKD092    ', '9910222231');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'AKR245    ', '7601236413');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'AKR245    ', '8204206413');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVV395    ', '7601236413');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'MVV395    ', '9307126312');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'TOA194    ', '9310052735');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'TKD092    ', '9602072717');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TDA123    ', '9910222231');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'TDA123    ', '9411111121');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'AER682    ', '9411111121');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'AKR245    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'BAD431    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'TDA123    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TGF345    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TKD092    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'AER682    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'JKN852    ', '8512121212');
+
+
+--
+-- TOC entry 3002 (class 0 OID 61614)
+-- Dependencies: 175
+-- Data for Name: hostby; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO hostby (dabbreviation, spname) VALUES ('AT', 'Architecture');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('KBME', 'Biotechnology');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('KBME', 'Chemistry Technology');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('EDIT', 'Computer Science');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('EDIT', 'Electronics Engineering');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('I', 'Industrial Technology');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('OC', 'Marine');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('ME', 'Mechanical');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('ME', 'Mechatronics');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('OC', 'Naval Commander');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('F', 'Physics Engineer');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('AT', 'Society Technology');
+INSERT INTO hostby (dabbreviation, spname) VALUES ('EDIT', 'Information Technology');
+
+
+--
+-- TOC entry 3004 (class 0 OID 62070)
+-- Dependencies: 177
+-- Data for Name: isaddmandatory; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('MVE052', 'Electronics Engineering', 'Sound and Vibration');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('TDA123', 'Society Technology', 'Sound and Vibration');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('TOA194', 'Architecture', 'Design for Sustainable Development');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('MBD923', 'Chemistry Technology', 'Industrial Ecology');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('MVV395', 'Computer Science', 'Software Engineering ');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('MVV395', 'Information Technology', 'Entrepreneurship and Business Design');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('MVY853', 'Information Technology', 'Interaction Design');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('TAS166', 'Chemistry Technology', 'Biotechnology');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('TKG531', 'Mechanical', 'Applied Mechanics');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('TLA124', 'Society Technology', 'Design for Sustainable Development');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('DTG678', 'Mechanical', 'Applied Mechanics');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('BAD431', 'Marine', 'Maritime Management');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('TGF345', 'Electronics Engineering', 'Embedded Electronic System Design');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('ASD341', 'Mechanical', 'Automotive Engineering');
+INSERT INTO isaddmandatory (coursecode, bprogramme, bname) VALUES ('TGF345', 'Mechanical', 'Materials Engineering');
+
+
+--
+-- TOC entry 3003 (class 0 OID 62025)
+-- Dependencies: 176
+-- Data for Name: ismandatory; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO ismandatory (coursecode, spname) VALUES ('TKD092', 'Information Technology');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('TKD092', 'Industrial Technology');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('TKD092', 'Computer Science');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('MVV395', 'Information Technology');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('MVV395', 'Computer Science');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('MVY853', 'Information Technology');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('TAS166', 'Computer Science');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('AKR245', 'Society Technology');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('AKR245', 'Marine');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('AKR245', 'Architecture');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('AKR245', 'Naval Commander');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('JKN852', 'Computer Science');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('JKN852', 'Electronics Engineering');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('TOA194', 'Physics Engineer');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('MVV395', 'Architecture');
+INSERT INTO ismandatory (coursecode, spname) VALUES ('JKN852', 'Mechatronics');
+
+
+--
+-- TOC entry 3009 (class 0 OID 215432)
+-- Dependencies: 182
+-- Data for Name: isprerequisite; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO isprerequisite (coursecode, prereq) VALUES ('MVV395', 'MVY853');
+INSERT INTO isprerequisite (coursecode, prereq) VALUES ('TKG431', 'TKG531');
+INSERT INTO isprerequisite (coursecode, prereq) VALUES ('DTG678', 'BAD431');
+INSERT INTO isprerequisite (coursecode, prereq) VALUES ('MBD923', 'TAS166');
+INSERT INTO isprerequisite (coursecode, prereq) VALUES ('KHU958', 'KHU959');
+INSERT INTO isprerequisite (coursecode, prereq) VALUES ('KHU959', 'KHU957');
+INSERT INTO isprerequisite (coursecode, prereq) VALUES ('TOA194', 'VMA581');
+INSERT INTO isprerequisite (coursecode, prereq) VALUES ('AKR245', 'AKR246');
+
+
+--
+-- TOC entry 3011 (class 0 OID 385923)
+-- Dependencies: 188
+-- Data for Name: isrecommended; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('AER682', 'Marine', 'Maritime Management');
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('MVV395', 'Marine', 'Maritime Management');
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('AER682', 'Architecture', 'Architecture and Urban Design');
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('MVV395', 'Information Technology', 'Entrepreneurship and Business Design');
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('MVV395', 'Computer Science', 'Computer Systems and Networks');
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('MVY853', 'Computer Science', 'Computer Systems and Networks');
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('JKN852', 'Computer Science', 'Software Engineering ');
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('TKG431', 'Mechanical', 'Automotive Engineering');
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('AER682', 'Physics Engineer', 'Applied Mechanics');
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('AKR245', 'Architecture', 'Design for Sustainable Development');
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('MVA123', 'Physics Engineer', 'Nanotechnology');
+INSERT INTO isrecommended (coursecode, bprogramme, bname) VALUES ('TDA123', 'Architecture', 'Architecture and Urban Design');
+
+
+--
+-- TOC entry 3005 (class 0 OID 62085)
+-- Dependencies: 178
+-- Data for Name: isregistered; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO isregistered (coursecode, studentid) VALUES ('AER682', '5407015273');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('AIC692', '7601236413');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('AKR245', '7801126312');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('ASD341', '8903128301');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('BAD431', '9104021896');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('DTG678', '9306236412');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('JKN852', '9402287512');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('KHU957', '9405051262');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('MBD923', '9409182432');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('MVA123', '9409214275');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('MVE052', '9411111121');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('MVV395', '9505181337');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('TDA123', '9505182270');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('TDA123', '9602072717');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('TDA123', '9910222231');
+
+
+--
+-- TOC entry 3007 (class 0 OID 62198)
+-- Dependencies: 180
+-- Data for Name: iswaiting; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO iswaiting (sincedate, studentid, coursecode) VALUES ('2012-01-24', '9411111121', 'AER682');
+INSERT INTO iswaiting (sincedate, studentid, coursecode) VALUES ('2015-10-13', '9402287512', 'AER682');
+INSERT INTO iswaiting (sincedate, studentid, coursecode) VALUES ('2014-04-28', '9409182432', 'AER682');
+INSERT INTO iswaiting (sincedate, studentid, coursecode) VALUES ('2015-10-12', '9310052735', 'AER682');
+INSERT INTO iswaiting (sincedate, studentid, coursecode) VALUES ('2016-01-06', '5407015273', 'AER682');
+INSERT INTO iswaiting (sincedate, studentid, coursecode) VALUES ('2013-08-26', '7601236413', 'JKN852');
+INSERT INTO iswaiting (sincedate, studentid, coursecode) VALUES ('2014-12-28', '9505181337', 'VMA581');
+INSERT INTO iswaiting (sincedate, studentid, coursecode) VALUES ('2015-02-28', '8903128301', 'VRT410');
+INSERT INTO iswaiting (sincedate, studentid, coursecode) VALUES ('2015-08-07', '9602072717', 'VMA581');
+
+
+--
+-- TOC entry 2999 (class 0 OID 61497)
+-- Dependencies: 172
+-- Data for Name: limitedcourse; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('VRT410', 120);
+INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('AIC692', 30);
+INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('AKR245', 100);
+INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('VMA581', 15);
+INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('AER682', 60);
+INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('JKN852', 40);
+
+
+--
+-- TOC entry 3000 (class 0 OID 61508)
+-- Dependencies: 173
+-- Data for Name: student; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO student (name, id, spname) VALUES ('RasmusDavidsson', '9505182270', 'Information Technology');
+INSERT INTO student (name, id, spname) VALUES ('Göran Svensson', '7601236413', 'Architecture');
+INSERT INTO student (name, id, spname) VALUES ('Oscmage Evertsson', '9402287512', 'Industrial Technology');
+INSERT INTO student (name, id, spname) VALUES ('Filip Pysen', '9306236412', 'Physics Engineer');
+INSERT INTO student (name, id, spname) VALUES ('Saser Persson', '9409182432', 'Computer Science');
+INSERT INTO student (name, id, spname) VALUES ('Jakob Holmus', '9910222231', 'Naval Commander');
+INSERT INTO student (name, id, spname) VALUES ('Lovre Bergbom', '9104021896', 'Society Technology');
+INSERT INTO student (name, id, spname) VALUES ('Vikky Bogren', '8903128301', 'Mechatronics');
+INSERT INTO student (name, id, spname) VALUES ('Dumle Brånnsgård', '5407015273', 'Industrial Technology');
+INSERT INTO student (name, id, spname) VALUES ('Tiny Mostafavi', '9602072717', 'Mechatronics');
+INSERT INTO student (name, id, spname) VALUES ('Jaxxy Boy', '9411111121', 'Mechanical');
+INSERT INTO student (name, id, spname) VALUES ('Bäski Bexxarsson', '9405051262', 'Electronics Engineering');
+INSERT INTO student (name, id, spname) VALUES ('Rasmus Davidsson', '9505181337', 'Biotechnology');
+INSERT INTO student (name, id, spname) VALUES ('Fishy Erlandsson', '9409214275', 'Naval Commander');
+INSERT INTO student (name, id, spname) VALUES ('Aarne Ranta', '7801126312', 'Computer Science');
+INSERT INTO student (name, id, spname) VALUES ('Tingy Liiing', '9402116421', 'Society Technology');
+INSERT INTO student (name, id, spname) VALUES ('Maddy H', '9310052735', 'Architecture');
+INSERT INTO student (name, id, spname) VALUES ('Bosse Ragnarsson', '8204206413', 'Marine');
+INSERT INTO student (name, id, spname) VALUES ('Fishy', '9307126312', 'Computer Science');
+INSERT INTO student (name, id, spname) VALUES ('Tino', '8512121212', 'Naval Commander');
+
+
+--
+-- TOC entry 2995 (class 0 OID 61269)
+-- Dependencies: 168
+-- Data for Name: studyprogramme; Type: TABLE DATA; Schema: public; Owner: tda357_049
+--
+
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Information Technology', 'IT');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Computer Science', 'CS');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Physics Engineer', 'PE');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Architecture', 'A');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Society Technology', 'ST');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Industrial Technology', 'I');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Biotechnology', 'B');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Naval Commander', 'NC');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Mechanical', 'MT');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Mechatronics', 'M');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Chemistry Technology', 'C');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Electronics Engineering', 'E');
+INSERT INTO studyprogramme (name, abbreviation) VALUES ('Marine', 'M');
+
+
+--
+-- TOC entry 2825 (class 2606 OID 66480)
+-- Name: branch_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY branch
+    ADD CONSTRAINT branch_pkey PRIMARY KEY (spname, name);
+
+
+--
+-- TOC entry 2835 (class 2606 OID 61577)
+-- Name: classification_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY classification
+    ADD CONSTRAINT classification_pkey PRIMARY KEY (name);
+
+
+--
+-- TOC entry 2827 (class 2606 OID 61490)
+-- Name: course_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY course
+    ADD CONSTRAINT course_pkey PRIMARY KEY (code);
+
+
+--
+-- TOC entry 2821 (class 2606 OID 63504)
+-- Name: department_name_key; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY department
+    ADD CONSTRAINT department_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 2823 (class 2606 OID 61468)
+-- Name: department_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY department
+    ADD CONSTRAINT department_pkey PRIMARY KEY (abbreviation);
+
+
+--
+-- TOC entry 2855 (class 2606 OID 216523)
+-- Name: hasbranch_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY hasbranch
+    ADD CONSTRAINT hasbranch_pkey PRIMARY KEY (studentid);
+
+
+--
+-- TOC entry 2851 (class 2606 OID 62217)
+-- Name: hasclassification_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY hasclassification
+    ADD CONSTRAINT hasclassification_pkey PRIMARY KEY (coursecode, classname);
+
+
+--
+-- TOC entry 2845 (class 2606 OID 62123)
+-- Name: hascompleted_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY hascompleted
+    ADD CONSTRAINT hascompleted_pkey PRIMARY KEY (coursecode, studentid);
+
+
+--
+-- TOC entry 2837 (class 2606 OID 61618)
+-- Name: hostby_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY hostby
+    ADD CONSTRAINT hostby_pkey PRIMARY KEY (dabbreviation, spname);
+
+
+--
+-- TOC entry 2841 (class 2606 OID 286590)
+-- Name: isaddmandatory_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY isaddmandatory
+    ADD CONSTRAINT isaddmandatory_pkey PRIMARY KEY (coursecode, bprogramme, bname);
+
+
+--
+-- TOC entry 2839 (class 2606 OID 62029)
+-- Name: ismandatory_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY ismandatory
+    ADD CONSTRAINT ismandatory_pkey PRIMARY KEY (coursecode, spname);
+
+
+--
+-- TOC entry 2853 (class 2606 OID 215436)
+-- Name: isprerequisite_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY isprerequisite
+    ADD CONSTRAINT isprerequisite_pkey PRIMARY KEY (coursecode, prereq);
+
+
+--
+-- TOC entry 2857 (class 2606 OID 385927)
+-- Name: isrecommended_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY isrecommended
+    ADD CONSTRAINT isrecommended_pkey PRIMARY KEY (coursecode, bname, bprogramme);
+
+
+--
+-- TOC entry 2843 (class 2606 OID 62089)
+-- Name: isregistered_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY isregistered
+    ADD CONSTRAINT isregistered_pkey PRIMARY KEY (coursecode, studentid);
+
+
+--
+-- TOC entry 2847 (class 2606 OID 62202)
+-- Name: iswaiting_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY iswaiting
+    ADD CONSTRAINT iswaiting_pkey PRIMARY KEY (studentid, coursecode);
+
+
+--
+-- TOC entry 2849 (class 2606 OID 62371)
+-- Name: iswaiting_sincedate_coursecode_key; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY iswaiting
+    ADD CONSTRAINT iswaiting_sincedate_coursecode_key UNIQUE (sincedate, coursecode);
+
+
+--
+-- TOC entry 2829 (class 2606 OID 61502)
+-- Name: limitedcourse_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY limitedcourse
+    ADD CONSTRAINT limitedcourse_pkey PRIMARY KEY (coursecode);
+
+
+--
+-- TOC entry 2831 (class 2606 OID 216500)
+-- Name: student_id_spname_key; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY student
+    ADD CONSTRAINT student_id_spname_key UNIQUE (id, spname);
+
+
+--
+-- TOC entry 2833 (class 2606 OID 61512)
+-- Name: student_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY student
+    ADD CONSTRAINT student_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2819 (class 2606 OID 61273)
+-- Name: studyprogramme_pkey; Type: CONSTRAINT; Schema: public; Owner: tda357_049; Tablespace: tda357
+--
+
+ALTER TABLE ONLY studyprogramme
+    ADD CONSTRAINT studyprogramme_pkey PRIMARY KEY (name);
+
+
+--
+-- TOC entry 2858 (class 2606 OID 66464)
+-- Name: branch_spname_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY branch
+    ADD CONSTRAINT branch_spname_fkey FOREIGN KEY (spname) REFERENCES studyprogramme(name);
+
+
+--
+-- TOC entry 2859 (class 2606 OID 61491)
+-- Name: course_departabb_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY course
+    ADD CONSTRAINT course_departabb_fkey FOREIGN KEY (departabb) REFERENCES department(abbreviation);
+
+
+--
+-- TOC entry 2879 (class 2606 OID 216529)
+-- Name: hasbranch_bname_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY hasbranch
+    ADD CONSTRAINT hasbranch_bname_fkey FOREIGN KEY (bname, bprogramme) REFERENCES branch(name, spname);
+
+
+--
+-- TOC entry 2878 (class 2606 OID 216524)
+-- Name: hasbranch_studentid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY hasbranch
+    ADD CONSTRAINT hasbranch_studentid_fkey FOREIGN KEY (studentid) REFERENCES student(id);
+
+
+--
+-- TOC entry 2880 (class 2606 OID 216534)
+-- Name: hasbranch_studentid_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY hasbranch
+    ADD CONSTRAINT hasbranch_studentid_fkey1 FOREIGN KEY (studentid, bprogramme) REFERENCES student(id, spname);
+
+
+--
+-- TOC entry 2875 (class 2606 OID 62223)
+-- Name: hasclassification_classname_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY hasclassification
+    ADD CONSTRAINT hasclassification_classname_fkey FOREIGN KEY (classname) REFERENCES classification(name);
+
+
+--
+-- TOC entry 2874 (class 2606 OID 62218)
+-- Name: hasclassification_coursecode_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY hasclassification
+    ADD CONSTRAINT hasclassification_coursecode_fkey FOREIGN KEY (coursecode) REFERENCES course(code);
+
+
+--
+-- TOC entry 2870 (class 2606 OID 62124)
+-- Name: hascompleted_coursecode_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY hascompleted
+    ADD CONSTRAINT hascompleted_coursecode_fkey FOREIGN KEY (coursecode) REFERENCES course(code);
+
+
+--
+-- TOC entry 2871 (class 2606 OID 62129)
+-- Name: hascompleted_studentid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY hascompleted
+    ADD CONSTRAINT hascompleted_studentid_fkey FOREIGN KEY (studentid) REFERENCES student(id);
+
+
+--
+-- TOC entry 2862 (class 2606 OID 61619)
+-- Name: hostby_dabbreviation_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY hostby
+    ADD CONSTRAINT hostby_dabbreviation_fkey FOREIGN KEY (dabbreviation) REFERENCES department(abbreviation);
+
+
+--
+-- TOC entry 2863 (class 2606 OID 61624)
+-- Name: hostby_spname_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY hostby
+    ADD CONSTRAINT hostby_spname_fkey FOREIGN KEY (spname) REFERENCES studyprogramme(name);
+
+
+--
+-- TOC entry 2866 (class 2606 OID 286591)
+-- Name: isaddmandatory_bname_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY isaddmandatory
+    ADD CONSTRAINT isaddmandatory_bname_fkey FOREIGN KEY (bprogramme, bname) REFERENCES branch(spname, name);
+
+
+--
+-- TOC entry 2867 (class 2606 OID 62075)
+-- Name: isaddmandatory_coursecode_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY isaddmandatory
+    ADD CONSTRAINT isaddmandatory_coursecode_fkey FOREIGN KEY (coursecode) REFERENCES course(code);
+
+
+--
+-- TOC entry 2864 (class 2606 OID 62030)
+-- Name: ismandatory_coursecode_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY ismandatory
+    ADD CONSTRAINT ismandatory_coursecode_fkey FOREIGN KEY (coursecode) REFERENCES course(code);
+
+
+--
+-- TOC entry 2865 (class 2606 OID 62035)
+-- Name: ismandatory_spname_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY ismandatory
+    ADD CONSTRAINT ismandatory_spname_fkey FOREIGN KEY (spname) REFERENCES studyprogramme(name);
+
+
+--
+-- TOC entry 2876 (class 2606 OID 215437)
+-- Name: isprerequisite_coursecode_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY isprerequisite
+    ADD CONSTRAINT isprerequisite_coursecode_fkey FOREIGN KEY (coursecode) REFERENCES course(code);
+
+
+--
+-- TOC entry 2877 (class 2606 OID 215442)
+-- Name: isprerequisite_prereq_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY isprerequisite
+    ADD CONSTRAINT isprerequisite_prereq_fkey FOREIGN KEY (prereq) REFERENCES course(code);
+
+
+--
+-- TOC entry 2882 (class 2606 OID 385933)
+-- Name: isrecommended_bprogramme_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY isrecommended
+    ADD CONSTRAINT isrecommended_bprogramme_fkey FOREIGN KEY (bprogramme, bname) REFERENCES branch(spname, name);
+
+
+--
+-- TOC entry 2881 (class 2606 OID 385928)
+-- Name: isrecommended_coursecode_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY isrecommended
+    ADD CONSTRAINT isrecommended_coursecode_fkey FOREIGN KEY (coursecode) REFERENCES course(code);
+
+
+--
+-- TOC entry 2868 (class 2606 OID 62090)
+-- Name: isregistered_coursecode_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY isregistered
+    ADD CONSTRAINT isregistered_coursecode_fkey FOREIGN KEY (coursecode) REFERENCES course(code);
+
+
+--
+-- TOC entry 2869 (class 2606 OID 62095)
+-- Name: isregistered_studentid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY isregistered
+    ADD CONSTRAINT isregistered_studentid_fkey FOREIGN KEY (studentid) REFERENCES student(id);
+
+
+--
+-- TOC entry 2873 (class 2606 OID 62208)
+-- Name: iswaiting_coursecode_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY iswaiting
+    ADD CONSTRAINT iswaiting_coursecode_fkey FOREIGN KEY (coursecode) REFERENCES limitedcourse(coursecode);
+
+
+--
+-- TOC entry 2872 (class 2606 OID 62203)
+-- Name: iswaiting_studentid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY iswaiting
+    ADD CONSTRAINT iswaiting_studentid_fkey FOREIGN KEY (studentid) REFERENCES student(id);
+
+
+--
+-- TOC entry 2860 (class 2606 OID 61503)
+-- Name: limitedcourse_coursecode_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY limitedcourse
+    ADD CONSTRAINT limitedcourse_coursecode_fkey FOREIGN KEY (coursecode) REFERENCES course(code);
+
+
+--
+-- TOC entry 2861 (class 2606 OID 61513)
+-- Name: student_spname_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tda357_049
+--
+
+ALTER TABLE ONLY student
+    ADD CONSTRAINT student_spname_fkey FOREIGN KEY (spname) REFERENCES studyprogramme(name);
+
+
+--
+-- TOC entry 3018 (class 0 OID 0)
+-- Dependencies: 5
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+-- Completed on 2016-02-19 22:53:45 CET
+
+--
+-- PostgreSQL database dump complete
+--
+

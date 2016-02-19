@@ -1,0 +1,40 @@
+/* StudentsFollowing */
+
+CREATE VIEW studentsfollowing AS
+SELECT student.id, student.name, student.spname, hasbranch.bname FROM (student LEFT JOIN hasbranch ON ((student.id = hasbranch.studentid)));
+
+
+
+/* FinishedCourses */ 
+
+CREATE VIEW finishedcourses AS
+SELECT student.name, hascompleted.grade, hascompleted.coursecode, course.creditpoints, student.id FROM ((hascompleted LEFT JOIN student ON ((student.id = hascompleted.studentid))) JOIN course ON ((hascompleted.coursecode = course.code)));
+
+
+
+/* Registrations */
+
+CREATE VIEW registrations AS
+SELECT isregistered.coursecode, isregistered.studentid, 'registered'::text AS status FROM isregistered UNION SELECT iswaiting.coursecode, iswaiting.studentid, 'waiting'::text AS status FROM iswaiting;
+
+
+
+/* PassedCourses */
+
+
+CREATE VIEW passedcourses AS
+SELECT finishedcourses.name, finishedcourses.grade, finishedcourses.coursecode, finishedcourses.creditpoints, finishedcourses.id FROM finishedcourses WHERE (finishedcourses.grade <> 'U'::bpchar);
+
+
+
+/* UnReadMandatory */
+
+CREATE VIEW unreadmandatory AS
+SELECT student.id, student.name, student.spname, hasbranch.bname, ismandatory.coursecode, hascompleted.grade FROM ((((student JOIN ismandatory ON (((student.spname)::text = (ismandatory.spname)::text))) JOIN course ON ((ismandatory.coursecode = course.code))) LEFT JOIN hasbranch ON ((student.id = hasbranch.studentid))) LEFT JOIN hascompleted ON (((student.id = hascompleted.studentid) AND (ismandatory.coursecode = hascompleted.coursecode)))) WHERE ((hascompleted.grade IS NULL) OR (hascompleted.grade = 'U'::bpchar)) UNION SELECT student.id, student.name, hasbranch.bprogramme AS spname, hasbranch.bname, course.code AS coursecode, hascompleted.grade FROM ((((student JOIN hasbranch ON ((student.id = hasbranch.studentid))) JOIN isaddmandatory ON ((((isaddmandatory.bname)::text = (hasbranch.bname)::text) AND ((isaddmandatory.bprogramme)::text = (hasbranch.bprogramme)::text)))) JOIN course ON ((course.code = isaddmandatory.coursecode))) LEFT JOIN hascompleted ON (((hasbranch.studentid = hascompleted.studentid) AND (isaddmandatory.coursecode = hascompleted.coursecode)))) WHERE ((hascompleted.grade IS NULL) OR (hascompleted.grade = 'U'::bpchar));
+
+
+
+/* PathToGraduation */
+
+CREATE VIEW pathtograduation AS
+SELECT p.id, p.name, COALESCE(cred.totalcreditpoints, (0)::real) AS totalcreditpoints, COALESCE(unman.unpassed_mandatory, (0)::bigint) AS unreadmandatorycourses, COALESCE(mathpoints.math_credits, (0)::real) AS mathcredits, COALESCE(respoints.res_credits, (0)::real) AS researchcredits, COALESCE(sem.nbrseminar, (0)::bigint) AS nbrofseminar, CASE WHEN (((((unman.unpassed_mandatory IS NULL) AND (mathpoints.math_credits >= (20)::double precision)) AND (respoints.res_credits >= (10)::double precision)) AND (sem.nbrseminar >= 1)) AND (recomcred.recompoints >= (10)::double precision)) THEN 'yes'::text ELSE 'no'::text END AS isqualifiedtograduate FROM ((((((studentsfollowing p NATURAL LEFT JOIN (SELECT passedcourses.id, sum(passedcourses.creditpoints) AS totalcreditpoints FROM passedcourses GROUP BY passedcourses.id) cred) NATURAL LEFT JOIN (SELECT unreadmandatory.id, count(unreadmandatory.coursecode) AS unpassed_mandatory FROM unreadmandatory GROUP BY unreadmandatory.id) unman) NATURAL LEFT JOIN (SELECT pc.id, sum(pc.creditpoints) AS math_credits FROM (passedcourses pc JOIN hasclassification hc ON ((pc.coursecode = hc.coursecode))) WHERE ((hc.classname)::text = 'Mathematics'::text) GROUP BY pc.id) mathpoints) NATURAL LEFT JOIN (SELECT pc.id, sum(pc.creditpoints) AS res_credits FROM (passedcourses pc JOIN hasclassification hc ON ((pc.coursecode = hc.coursecode))) WHERE ((hc.classname)::text = 'Research'::text) GROUP BY pc.id) respoints) NATURAL LEFT JOIN (SELECT pc.id, count(pc.coursecode) AS nbrseminar FROM (passedcourses pc JOIN hasclassification hc ON ((pc.coursecode = hc.coursecode))) WHERE ((hc.classname)::text = 'Seminar'::text) GROUP BY pc.id) sem) NATURAL LEFT JOIN (SELECT pc.id, sum(pc.creditpoints) AS recompoints FROM (passedcourses pc JOIN isrecommended ir ON ((pc.coursecode = ir.coursecode))) GROUP BY pc.id) recomcred);
