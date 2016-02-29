@@ -87,3 +87,9 @@ SELECT p.id, p.name, COALESCE(cred.totalcreditpoints, (0)) AS totalcreditpoints,
 		
 		-- its for checking if a student is qualified to graduate. This doesn't display in the view.
 		NATURAL LEFT JOIN (SELECT pc.id, sum(pc.creditpoints) AS recompoints FROM (passedcourses pc JOIN isrecommended ir ON ((pc.coursecode = ir.coursecode))) GROUP BY pc.id) recomcred);
+
+
+/* Course Queue Positions */
+CREATE OR REPLACE VIEW coursequeuepositions AS
+SELECT sincedate, studentid, coursecode, ROW_NUMBER() OVER (PARTITION BY coursecode ORDER BY sincedate) AS POSITION
+FROM isWaiting

@@ -1,7 +1,7 @@
 # Trigger for registering Student
 
 CREATE TRIGGER registeringStudent 
-INSTEAD OF INSERT OR UPDATE OR DELETE ON registrations
+INSTEAD OF INSERT ON registrations
 FOR EACH ROW
 EXECUTE PROCEDURE registeringStudent();
 

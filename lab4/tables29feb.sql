@@ -99,7 +99,7 @@ CONSTRAINT ValidGrade CHECK(grade in('U','3','4','5'))
 );
 
 CREATE TABLE IsWaiting(
-	sinceDate		DATE,
+	sinceDate		TIMESTAMP,
 	studentID		CHAR(10) REFERENCES Student,
 	courseCode		CHAR(6)	REFERENCES LimitedCourse,
 PRIMARY KEY(studentID, courseCode),

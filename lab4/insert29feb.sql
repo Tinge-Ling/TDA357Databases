@@ -79,6 +79,8 @@ INSERT INTO studyprogramme (name, abbreviation) VALUES ('Marine', 'M');
 
 /* Student */
 
+INSERT INTO student (name, id, spname) VALUES ('TestTrigger2 case2 queuepos1', '2121212121', 'Mechanical');
+INSERT INTO student (name, id, spname) VALUES ('TestTrigger2 case2 queuepos2', '1111122222', 'Biotechnology');
 INSERT INTO student (name, id, spname) VALUES ('RasmusDavidsson', '9505182270', 'Information Technology');
 INSERT INTO student (name, id, spname) VALUES ('Göran Svensson', '7601236413', 'Architecture');
 INSERT INTO student (name, id, spname) VALUES ('Oscmage Evertsson', '9402287512', 'Industrial Technology');
@@ -99,6 +101,16 @@ INSERT INTO student (name, id, spname) VALUES ('Maddy H', '9310052735', 'Archite
 INSERT INTO student (name, id, spname) VALUES ('Bosse Ragnarsson', '8204206413', 'Marine');
 INSERT INTO student (name, id, spname) VALUES ('Fishy', '9307126312', 'Computer Science');
 INSERT INTO student (name, id, spname) VALUES ('Tino', '8512121212', 'Naval Commander');
+INSERT INTO student (name, id, spname) VALUES ('TestTrigger1 allPrereq ', '3131313131', 'Society Technology');
+INSERT INTO student (name, id, spname) VALUES ('TestTrigger1 raiseEx1', '1212121212', 'Naval Commander');
+INSERT INTO student (name, id, spname) VALUES ('TestTrigger1 raiseEx2', '3232323232', 'Information Technology');
+INSERT INTO student (name, id, spname) VALUES ('TestTrigger1 raiseEx3', '1313131313', 'Mechanical');
+INSERT INTO student (name, id, spname) VALUES ('TestTrigger1 noPrereq', '4141414141', 'Architecture');
+INSERT INTO student (name, id, spname) VALUES ('TestTrigger2 case2', '2222222222', 'Architecture');
+INSERT INTO student (name, id, spname) VALUES ('TestTrigger2 case1', '1111111111', 'Physics Engineer');
+INSERT INTO student (name, id, spname) VALUES ('TestTrigger2 case3', '3333333333', 'Marine');
+INSERT INTO student (name, id, spname) VALUES ('TestTrigger2 case4', '4444444444', 'Computer Science');
+
 
 
 
@@ -109,10 +121,9 @@ INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('VRT410', 120);
 INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('AIC692', 30);
 INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('AKR245', 100);
 INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('VMA581', 15);
-INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('AER682', 60);
 INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('JKN852', 40);
-
-
+INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('AER682', 1);
+INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('MVV395', 5);
 
 
 
@@ -182,40 +193,43 @@ INSERT INTO hasclassification (coursecode, classname) VALUES ('TDA123', 'Mathema
 
 /* HasCompleted */
 
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'MVV395', '5407015273');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'TLA124', '7801126312');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'AKR245', '7801126312');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TKG531', '7601236413');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'ASD341', '9104021896');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'KHU957', '9104021896');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'KHU957', '8903128301');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'DTG678', '8903128301');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'DTG678', '5407015273');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'BAD431', '9306236412');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'BAD431', '9910222231');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'VRT410', '9402287512');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'VRT410', '9306236412');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'BAD431', '5407015273');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVE052', '9602072717');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVE052', '9409182432');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVY853', '9411111121');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'TKD092', '9910222231');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'AKR245', '7601236413');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'AKR245', '8204206413');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVV395', '7601236413');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'MVV395', '9307126312');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'TOA194', '9310052735');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'TKD092', '9602072717');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TDA123', '9910222231');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'TDA123', '9411111121');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'AER682', '9411111121');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'AKR245', '8512121212');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'BAD431', '8512121212');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'TDA123', '8512121212');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TGF345', '8512121212');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TKD092', '8512121212');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'AER682', '8512121212');
-INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'JKN852', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'MVV395    ', '5407015273');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'TLA124    ', '7801126312');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'AKR245    ', '7801126312');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TKG531    ', '7601236413');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'ASD341    ', '9104021896');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'KHU957    ', '9104021896');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'KHU957    ', '8903128301');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'DTG678    ', '8903128301');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'DTG678    ', '5407015273');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'BAD431    ', '9306236412');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'BAD431    ', '9910222231');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'VRT410    ', '9402287512');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'VRT410    ', '9306236412');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'BAD431    ', '5407015273');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVE052    ', '9602072717');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVE052    ', '9409182432');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVY853    ', '9411111121');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'TKD092    ', '9910222231');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'AKR245    ', '7601236413');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'AKR245    ', '8204206413');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'MVV395    ', '7601236413');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'MVV395    ', '9307126312');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('U', 'TOA194    ', '9310052735');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'TKD092    ', '9602072717');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TDA123    ', '9910222231');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'TDA123    ', '9411111121');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'AER682    ', '9411111121');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'BAD431    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('5', 'TDA123    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TGF345    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TKD092    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'JKN852    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'AKR245    ', '8512121212');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'TDA123    ', '3131313131');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'MVY853    ', '3232323232');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('4', 'TKG531    ', '1313131313');
+INSERT INTO hascompleted (grade, coursecode, studentid) VALUES ('3', 'TKG431    ', '1313131313');
 
 
 
@@ -234,6 +248,7 @@ INSERT INTO hostby (dabbreviation, spname) VALUES ('OC', 'Naval Commander');
 INSERT INTO hostby (dabbreviation, spname) VALUES ('F', 'Physics Engineer');
 INSERT INTO hostby (dabbreviation, spname) VALUES ('AT', 'Society Technology');
 INSERT INTO hostby (dabbreviation, spname) VALUES ('EDIT', 'Information Technology');
+
 
 
 
@@ -287,9 +302,8 @@ INSERT INTO isprerequisite (coursecode, prereq) VALUES ('MBD923', 'TAS166');
 INSERT INTO isprerequisite (coursecode, prereq) VALUES ('KHU958', 'KHU959');
 INSERT INTO isprerequisite (coursecode, prereq) VALUES ('KHU959', 'KHU957');
 INSERT INTO isprerequisite (coursecode, prereq) VALUES ('TOA194', 'VMA581');
-INSERT INTO isprerequisite (coursecode, prereq) VALUES ('AKR245', 'AKR246');
-
-
+INSERT INTO isprerequisite (coursecode, prereq) VALUES ('AKR246', 'AKR245');
+INSERT INTO isprerequisite (coursecode, prereq) VALUES ('AER682', 'TDA123');
 
 /* IsRecommended */
 
@@ -325,6 +339,11 @@ INSERT INTO isregistered (coursecode, studentid) VALUES ('MVV395', '9505181337')
 INSERT INTO isregistered (coursecode, studentid) VALUES ('TDA123', '9505182270');
 INSERT INTO isregistered (coursecode, studentid) VALUES ('TDA123', '9602072717');
 INSERT INTO isregistered (coursecode, studentid) VALUES ('TDA123', '9910222231');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('TAS166', '9505182270');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('AIC692', '8512121212');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('MVV395', '3232323232');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('AIC692', '4141414141');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('VRT410', '8903128301');
 
 
 
