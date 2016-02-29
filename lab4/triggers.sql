@@ -29,7 +29,7 @@ BEGIN
 					THEN INSERT INTO isregistered VALUES (new.coursecode, new.studentid);
 							return new;
 						-- if no, put the student into the waiting list
-					ELSE INSERT INTO iswaiting VALUES(current_date, new.studentid,new.coursecode);
+					ELSE INSERT INTO iswaiting VALUES(current_timestamp, new.studentid,new.coursecode);
 							return new;
 					END IF;
 				-- if the course has no limited number of participants		

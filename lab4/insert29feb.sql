@@ -109,7 +109,6 @@ INSERT INTO student (name, id, spname) VALUES ('TestTrigger1 noPrereq', '4141414
 INSERT INTO student (name, id, spname) VALUES ('TestTrigger2 case2', '2222222222', 'Architecture');
 INSERT INTO student (name, id, spname) VALUES ('TestTrigger2 case1', '1111111111', 'Physics Engineer');
 INSERT INTO student (name, id, spname) VALUES ('TestTrigger2 case3', '3333333333', 'Marine');
-INSERT INTO student (name, id, spname) VALUES ('TestTrigger2 case4', '4444444444', 'Computer Science');
 
 
 
@@ -119,7 +118,7 @@ INSERT INTO student (name, id, spname) VALUES ('TestTrigger2 case4', '4444444444
 
 INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('VRT410', 120);
 INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('AIC692', 30);
-INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('AKR245', 100);
+INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('AKR245', 3);
 INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('VMA581', 15);
 INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('JKN852', 40);
 INSERT INTO limitedcourse (coursecode, maxparticipants) VALUES ('AER682', 1);
