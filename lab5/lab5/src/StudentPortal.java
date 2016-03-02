@@ -6,20 +6,20 @@
  * 2) Implement the three functions getInformation, registerStudent
  *    and unregisterStudent.
  */
+
 import java.sql.*; // JDBC stuff.
 import java.util.Properties;
 import java.util.Scanner;
 import java.io.*;  // Reading user input.
 
-public class StudentPortal
-{
+public class StudentPortal {
     /* TODO Here you should put your database name, username and password */
     static final String USERNAME = "tda357_049";
     static final String PASSWORD = "tingkiwi";
 
     /* Print command usage.
      * /!\ you don't need to change this function! */
-    public static void usage () {
+    public static void usage() {
         System.out.println("Usage:");
         System.out.println("    i[nformation]");
         System.out.println("    r[egister] <course>");
@@ -29,14 +29,13 @@ public class StudentPortal
 
     /* main: parses the input commands.
      * /!\ You don't need to change this function! */
-    public static void main(String[] args) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         try {
             Class.forName("org.postgresql.Driver");
             String url = "jdbc:postgresql://ate.ita.chalmers.se/";
             Properties props = new Properties();
-            props.setProperty("user",USERNAME);
-            props.setProperty("password",PASSWORD);
+            props.setProperty("user", USERNAME);
+            props.setProperty("password", PASSWORD);
             Connection conn = DriverManager.getConnection(url, props);
 
             String student = args[0]; // This is the identifier for the student.
@@ -44,7 +43,7 @@ public class StudentPortal
             Console console = System.console();
             usage();
             System.out.println("Welcome!");
-            while(true) {
+            while (true) {
                 String mode = console.readLine("? > ");
                 String[] cmd = mode.split(" +");
                 cmd[0] = cmd[0].toLowerCase();
@@ -78,26 +77,54 @@ public class StudentPortal
      * - the mandatory courses that the student has yet to read.
      * - whether or not the student fulfills the requirements for graduation
      */
-    static void getInformation(Connection conn, String student) throws SQLException
-    {
-        // TODO: Your implementation here
+    static void getInformation(Connection conn, String student) throws SQLException {
+
     }
 
     /* Register: Given a student id number and a course code, this function
      * should try to register the student for that course.
      */
     static void registerStudent(Connection conn, String student, String course)
-            throws SQLException
-    {
-        // TODO: Your implementation here
+            throws SQLException {
+        String registerStudentStr = "INSERT INTO Registrations (coursecode, studentid) VALUES ('"+course+"','"+student+"')";
+
+        PreparedStatement registerStudentStm = conn.prepareStatement(registerStudentStr);
+        registerStudentStm.executeUpdate();
+        registerStudentStm.close();
+
+        String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
+        Statement getCourseStm = conn.createStatement();
+        ResultSet rs = getCourseStm.executeQuery(getCourseNameStr);
+        if(rs.next()) {
+            System.out.println("You are now successfully registered to course "+course+" "+rs.getString(1)+"!");
+
+        }
+
+        rs.close();
+        getCourseStm.close();
     }
+
 
     /* Unregister: Given a student id number and a course code, this function
      * should unregister the student from that course.
      */
     static void unregisterStudent(Connection conn, String student, String course)
-            throws SQLException
-    {
-        // TODO: Your implementation here
+            throws SQLException {
+        String unregStudentStr = "DELETE FROM registrations WHERE studentid = '"+student+"' AND coursecode = '"+course+"';";
+
+        PreparedStatement unregStudentStm = conn.prepareStatement(unregStudentStr);
+        unregStudentStm.executeUpdate();
+        unregStudentStm.close();
+
+        String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
+        Statement getCourseStm = conn.createStatement();
+        ResultSet rs = getCourseStm.executeQuery(getCourseNameStr);
+        if(rs.next()) {
+            System.out.println("You are now successfully unregistered from course "+course+" "+rs.getString(1)+"!");
+
+        }
+
+        rs.close();
+        getCourseStm.close();
     }
 }

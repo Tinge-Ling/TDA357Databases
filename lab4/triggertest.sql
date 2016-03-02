@@ -22,7 +22,7 @@ INSERT INTO Registrations (coursecode, studentid) VALUES ('TKG431','1313131313')
 
 --Case1: Unregister the student ('TestTrigger2 case1') from the course ('TOA194)') and then unregister again from the same course. Show that the student is unregistered
 Query:
-DELETE FROM registrations WHERE studentid = '1111111111' AND coursecode = ‘TOA194’;
+DELETE FROM registrations WHERE studentid = '1111111111' AND coursecode = 'TOA194';
 DELETE FROM registrations WHERE studentid = '1111111111' AND coursecode = 'TOA194';
 
 --Case2: Unregister the student ('TestTrigger2 case2') from a restricted course ('MVV395') that they are registered to, and which has at least two students in the queue. Register again to the same course and show that the student gets the correct (last) position in the waiting list.
