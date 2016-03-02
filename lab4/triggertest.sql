@@ -1,9 +1,9 @@
-# Testing values for trigger, registeringStudent
+# Testing values for trigger 1, registeringStudent
 
 --Student wants to register to a course that doesn't need any prerequisites -> should work
 INSERT INTO Registrations (coursecode, studentid) VALUES ('AIC692','4141414141');
 
---Student has all the prerequisites, not in the lists, have not passed -> should work
+--Student has all the prerequisites, not in the lists, have not passed -> should work (in waiting list)
 INSERT INTO Registrations (coursecode, studentid) VALUES ('AER682','3131313131');
 
 
@@ -18,20 +18,22 @@ INSERT INTO Registrations (coursecode, studentid) VALUES ('MVV395','3232323232')
 INSERT INTO Registrations (coursecode, studentid) VALUES ('TKG431','1313131313');
 
 
-# Testing values for trigger, courseunreg
+# Testing values for trigger 2, courseunreg
 
 --Case1: Unregister the student ('TestTrigger2 case1') from the course ('TOA194)') and then unregister again from the same course. Show that the student is unregistered
-INSERT INTO isregistered VALUES('TOA194','1111111111');
-TODO write queries for unregistering this student when the trigger is done
+Query:
+DELETE FROM registrations WHERE studentid = '1111111111' AND coursecode = ‘TOA194’;
+DELETE FROM registrations WHERE studentid = '1111111111' AND coursecode = 'TOA194';
 
 --Case2: Unregister the student ('TestTrigger2 case2') from a restricted course ('MVV395') that they are registered to, and which has at least two students in the queue. Register again to the same course and show that the student gets the correct (last) position in the waiting list.
-
---make the course full and put students on the course
-INSERT INTO isregistered VALUES('MVV395','2222222222');
-INSERT INTO isregistered VALUES('MVV395','5407015273');
-INSERT INTO isregistered VALUES('MVV395','8204206413');
+Query:
+DELETE FROM registrations WHERE studentid = '2222222222' AND coursecode = 'MVV395';
+INSERT INTO registrations (coursecode, studentid) VALUES ('MVV395','2222222222');
 
 
---Case3: Unregister the student from a restricted course that they are registered to, and which has at least two students in the queue. Register again to the same course and show that the student gets the correct (last) position in the waiting list.
+--Case3: Finally, unregister the student ('TestTrigger2 case3')  from an overfull course (‘AKR245’), i.e. one with more students registered than there are places on the course (you need to set this situation up in the database directly). Show that no student was moved from the queue to being registered as a result.
+Query:
+DELETE FROM registrations WHERE studentid = '3333333333' AND coursecode = 'AKR245';
 
---Case4: Finally, unregister a student from an overfull course, i.e. one with more students registered than there are places on the course (you need to set this situation up in the database directly). Show that no student was moved from the queue to being registered as a result.
+
+

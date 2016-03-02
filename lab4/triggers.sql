@@ -40,3 +40,68 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql' ;
 
+
+
+# Trigger for courseUnReg
+CREATE TRIGGER courseUnReg INSTEAD OF DELETE OR UPDATE
+	ON Registrations	
+	FOR EACH ROW
+EXECUTE PROCEDURE unregisterStudent();
+
+
+# Function for unregisteringStudent()
+CREATE OR REPLACE FUNCTION unregisterStudent()
+RETURNS TRIGGER AS $$
+BEGIN
+
+	-- If the student is registered, then delete from registrations and isregistered.
+	IF (SELECT EXISTS (SELECT 1 FROM Registrations WHERE status = 'registered' AND old.studentid = studentid))
+		THEN 
+			DELETE FROM isregistered WHERE (old.studentid = studentid AND old.coursecode = coursecode);
+			
+			--If the course is full (admins changing manually can cause this error)
+			IF ((SELECT EXISTS (SELECT 1 FROM limitedcourse WHERE coursecode = old.coursecode) 
+					AND
+				((SELECT count(*) FROM registrations WHERE coursecode=old.coursecode AND status='registered')
+					<
+				(SELECT maxparticipants FROM limitedcourse WHERE coursecode=old.coursecode)))) 
+
+				--If the old.course has any students waiting to register to it. 
+				THEN IF (SELECT EXISTS (SELECT 1 FROM registrations WHERE status = 'waiting' AND coursecode=old.coursecode))
+					
+					
+					THEN
+						--Now the student is officially registered to the course, and not waiting anymore
+						INSERT INTO isregistered (coursecode,studentid)
+						VALUES
+						((SELECT code FROM course
+						    WHERE code = old.coursecode),
+						(SELECT reg.studentid
+						    FROM registrations AS reg, coursequeuepositions AS cqp
+						    WHERE (cqp.position = '1' 
+							 AND cqp.studentid = reg.studentid 
+							 AND reg.coursecode = old.coursecode
+							 AND reg.status = 'waiting')));
+
+						--Deleting the newly registered course for student in iswaiting
+						DELETE 
+						FROM iswaiting AS iw
+						 	USING registrations AS reg,
+						 		  coursequeuepositions AS cqp
+						WHERE (cqp.position = '1' 
+						AND cqp.studentid = reg.studentid 
+						AND reg.coursecode = old.coursecode
+						AND iw.studentid = reg.studentid
+						AND reg.status = 'registered');
+				ELSE
+				END IF;
+
+		ELSE
+		END IF;
+
+		RETURN OLD;
+		
+	ELSE 
+	END IF;
+END;
+$$ LANGUAGE 'plpgsql';
