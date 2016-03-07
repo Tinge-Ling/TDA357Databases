@@ -79,13 +79,18 @@ public class StudentPortal {
      */
     static void getInformation(Connection conn, String student) throws SQLException
     {
-        String studentQuery = "SELECT name,spname FROM Student WHERE id = '"+student+"'";
-        String branchQuery = "SELECT bname FROM hasbranch WHERE studentid = '"+student+"'";
+        String studentQuery = "SELECT name,spname FROM studentsfollowing WHERE id = '"+student+"'";
+
+        String branchQuery = "SELECT bname FROM studentsfollowing WHERE id = '"+student+"'";
+
         String readCoursesQuery = "SELECT c.coursename,c.code,fc.grade,fc.creditpoints FROM Course AS c, finishedcourses AS fc " +
                 "WHERE fc.id = '"+student+"' AND fc.coursecode = c.code";
+
         String registeredCoursesQuery = "SELECT c.coursename,c.code,reg.status FROM Course AS c, registrations AS reg " +
                 "WHERE reg.studentid = '"+student+"' AND reg.coursecode = c.code";
+
         String positionQuery = "SELECT cqp.position FROM coursequeuepositions AS cqp WHERE cqp.studentid = '"+student+"'";
+
         String pathToGradQuery = "SELECT ptg.nbrofseminar, ptg.mathcredits, ptg.researchcredits, ptg.totalcreditpoints, " +
                 "ptg.isqualifiedtograduate " +
                 "FROM pathtograduation AS ptg " +
@@ -94,7 +99,7 @@ public class StudentPortal {
 
         Statement myStatement = conn.createStatement();
         Statement mS = conn.createStatement();
-        ResultSet res = myStatement.executeQuery(studentQuery);
+        ResultSet res = myStatement.executeQuery(studentQuery); 
         ResultSet res2;
 
 
