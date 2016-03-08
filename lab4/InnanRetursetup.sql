@@ -1,4 +1,4 @@
--- Tables 
+# Tables 
 
 CREATE TABLE Department(
 	name			VARCHAR(100) NOT NULL,		
@@ -122,7 +122,7 @@ CREATE TABLE isprerequisite (
 );
 
 
--- Views
+# Views
 
 
 /* Department */
@@ -468,6 +468,7 @@ INSERT INTO isregistered (coursecode, studentid) VALUES ('TDA123', '9910222231')
 INSERT INTO isregistered (coursecode, studentid) VALUES ('TAS166', '9505182270');
 INSERT INTO isregistered (coursecode, studentid) VALUES ('AIC692', '8512121212');
 INSERT INTO isregistered (coursecode, studentid) VALUES ('MVV395', '3232323232');
+INSERT INTO isregistered (coursecode, studentid) VALUES ('AIC692', '4141414141');
 INSERT INTO isregistered (coursecode, studentid) VALUES ('VRT410', '8903128301');
 
 

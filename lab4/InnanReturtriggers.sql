@@ -1,4 +1,12 @@
--- Function for registering Student
+# Trigger for registering Student
+
+CREATE TRIGGER registeringStudent 
+INSTEAD OF INSERT ON registrations
+FOR EACH ROW
+EXECUTE PROCEDURE registeringStudent();
+
+
+# Function for registering Student
 CREATE OR REPLACE FUNCTION registeringStudent() RETURNS TRIGGER AS $$
 BEGIN
 
@@ -32,14 +40,16 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql' ;
 
--- Trigger for registering Student
 
-CREATE TRIGGER registeringStudent 
-INSTEAD OF INSERT ON registrations
-FOR EACH ROW
-EXECUTE PROCEDURE registeringStudent();
 
--- Function for unregisteringStudent()
+# Trigger for courseUnReg
+CREATE TRIGGER courseUnReg INSTEAD OF DELETE OR UPDATE
+	ON Registrations	
+	FOR EACH ROW
+EXECUTE PROCEDURE unregisterStudent();
+
+
+# Function for unregisteringStudent()
 CREATE OR REPLACE FUNCTION unregisterStudent()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -91,16 +101,7 @@ BEGIN
 
 		RETURN OLD;
 		
-	ELSE
-	RETURN OLD; 
+	ELSE 
 	END IF;
 END;
 $$ LANGUAGE 'plpgsql';
-
-
--- Trigger for courseUnReg
-CREATE TRIGGER courseUnReg INSTEAD OF DELETE OR UPDATE
-	ON Registrations	
-	FOR EACH ROW
-EXECUTE PROCEDURE unregisterStudent();
-
