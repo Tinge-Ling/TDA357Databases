@@ -79,6 +79,8 @@ public class StudentPortal {
      */
     static void getInformation(Connection conn, String student) throws SQLException
     {
+        String positionQuery = "";
+
         String studentQuery = "SELECT name,spname FROM studentsfollowing WHERE id = '"+student+"'";
 
         String branchQuery = "SELECT bname FROM studentsfollowing WHERE id = '"+student+"'";
@@ -89,8 +91,6 @@ public class StudentPortal {
         String registeredCoursesQuery = "SELECT c.coursename,c.code,reg.status FROM Course AS c, registrations AS reg " +
                 "WHERE reg.studentid = '"+student+"' AND reg.coursecode = c.code";
 
-        String positionQuery = "SELECT cqp.position FROM coursequeuepositions AS cqp WHERE cqp.studentid = '"+student+"'";
-
         String pathToGradQuery = "SELECT ptg.nbrofseminar, ptg.mathcredits, ptg.researchcredits, ptg.totalcreditpoints, " +
                 "ptg.isqualifiedtograduate " +
                 "FROM pathtograduation AS ptg " +
@@ -99,7 +99,7 @@ public class StudentPortal {
 
         Statement myStatement = conn.createStatement();
         Statement mS = conn.createStatement();
-        ResultSet res = myStatement.executeQuery(studentQuery); 
+        ResultSet res = myStatement.executeQuery(studentQuery);
         ResultSet res2;
 
 
@@ -113,7 +113,11 @@ public class StudentPortal {
 
         res = myStatement.executeQuery(branchQuery);
         if(res.next()) {
-            System.out.println("Branch: " + res.getString(1));
+            if(res.getString(1) == null){
+                System.out.println("Branch: Have none");
+            }else {
+                System.out.println("Branch: " + res.getString(1));
+            }
             res.close();
         }
 
@@ -127,15 +131,20 @@ public class StudentPortal {
         res.close();
 
         res = myStatement.executeQuery(registeredCoursesQuery);
-        res2 = mS.executeQuery(positionQuery);
+
+
         System.out.print("\nRegistered Courses (name (code), credits : status):\n");
 
         while(res.next()){
             if(res.getString(3).equals("waiting")){
+                String s = res.getString(2);
+                positionQuery = "SELECT cqp.position FROM coursequeuepositions AS cqp, Course AS c WHERE cqp.studentid = '" + student + "' AND cqp.coursecode = '" + s + "'";
+                res2 = mS.executeQuery(positionQuery);
                 if(res2.next()){
                     System.out.print(res.getString(1)+" ("+res.getString(2)+"): "+ res.getString(3)+" as nr "+ res2.getString(1)+"\n");
 
                 }
+                res2.close();
             }else {
                 System.out.print(res.getString(1)+" ("+res.getString(2)+"): "+ res.getString(3)+"\n");
 
@@ -143,7 +152,7 @@ public class StudentPortal {
 
 
         }
-        res2.close();
+
         res.close();
         mS.close();
 
@@ -167,20 +176,27 @@ public class StudentPortal {
             throws SQLException {
         String registerStudentStr = "INSERT INTO Registrations (coursecode, studentid) VALUES ('"+course+"','"+student+"')";
 
-        PreparedStatement registerStudentStm = conn.prepareStatement(registerStudentStr);
-        registerStudentStm.executeUpdate();
-        registerStudentStm.close();
+        try {
+            PreparedStatement registerStudentStm = conn.prepareStatement(registerStudentStr);
+            registerStudentStm.executeUpdate();
+            registerStudentStm.close();
+            String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
+            Statement getCourseStm = conn.createStatement();
+            ResultSet rs = getCourseStm.executeQuery(getCourseNameStr);
+            if(rs.next()) {
+                System.out.println("You are now successfully registered to course "+course+" "+rs.getString(1)+"!");
 
-        String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
-        Statement getCourseStm = conn.createStatement();
-        ResultSet rs = getCourseStm.executeQuery(getCourseNameStr);
-        if(rs.next()) {
-            System.out.println("You are now successfully registered to course "+course+" "+rs.getString(1)+"!");
+            }
+            rs.close();
+            getCourseStm.close();
+        }catch(SQLException e){
 
+            System.out.println(e.toString());
         }
 
-        rs.close();
-        getCourseStm.close();
+
+
+
     }
 
 
@@ -188,22 +204,27 @@ public class StudentPortal {
      * should unregister the student from that course.
      */
     static void unregisterStudent(Connection conn, String student, String course)
+
             throws SQLException {
-        String unregStudentStr = "DELETE FROM registrations WHERE studentid = '"+student+"' AND coursecode = '"+course+"';";
+        String unregStudentStr = "DELETE FROM registrations WHERE studentid = '" + student + "' AND coursecode = '" + course + "';";
 
-        PreparedStatement unregStudentStm = conn.prepareStatement(unregStudentStr);
-        unregStudentStm.executeUpdate();
-        unregStudentStm.close();
+        try {
+            PreparedStatement unregStudentStm = conn.prepareStatement(unregStudentStr);
+            unregStudentStm.executeUpdate();
+            unregStudentStm.close();
 
-        String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
-        Statement getCourseStm = conn.createStatement();
-        ResultSet rs = getCourseStm.executeQuery(getCourseNameStr);
-        if(rs.next()) {
-            System.out.println("You are now successfully unregistered from course "+course+" "+rs.getString(1)+"!");
+            String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
+            Statement getCourseStm = conn.createStatement();
+            ResultSet rs = getCourseStm.executeQuery(getCourseNameStr);
+            if (rs.next()) {
+                System.out.println("You are now successfully unregistered from course " + course + " " + rs.getString(1) + "!");
 
+            }
+
+            rs.close();
+            getCourseStm.close();
+        } catch (SQLException e) {
+            System.out.println(e.toString());
         }
-
-        rs.close();
-        getCourseStm.close();
     }
 }

@@ -39,13 +39,16 @@ INSTEAD OF INSERT ON registrations
 FOR EACH ROW
 EXECUTE PROCEDURE registeringStudent();
 
+
+
 -- Function for unregisteringStudent()
+
 CREATE OR REPLACE FUNCTION unregisterStudent()
 RETURNS TRIGGER AS $$
 BEGIN
 
 	-- If the student is registered, then delete from registrations and isregistered.
-	IF (SELECT EXISTS (SELECT 1 FROM Registrations WHERE status = 'registered' AND old.studentid = studentid))
+	IF (SELECT EXISTS (SELECT 1 FROM Registrations WHERE old.status = 'registered' AND old.studentid = studentid AND old.coursecode = coursecode))
 		THEN 
 			DELETE FROM isregistered WHERE (old.studentid = studentid AND old.coursecode = coursecode);
 			
@@ -82,6 +85,7 @@ BEGIN
 						AND cqp.studentid = reg.studentid 
 						AND reg.coursecode = old.coursecode
 						AND iw.studentid = reg.studentid
+						AND old.studentid = iw.studentid
 						AND reg.status = 'registered');
 				ELSE
 				END IF;
@@ -92,6 +96,15 @@ BEGIN
 		RETURN OLD;
 		
 	ELSE
+		DELETE 
+		FROM iswaiting AS iw
+		 	USING registrations AS reg,
+		 		  coursequeuepositions AS cqp
+		WHERE (cqp.studentid = reg.studentid 
+		AND reg.coursecode = old.coursecode
+		AND iw.studentid = reg.studentid
+		AND old.studentid = iw.studentid
+		AND reg.status = 'waiting');
 	RETURN OLD; 
 	END IF;
 END;
