@@ -85,7 +85,6 @@ BEGIN
 						AND cqp.studentid = reg.studentid 
 						AND reg.coursecode = old.coursecode
 						AND iw.studentid = reg.studentid
-						AND old.studentid = iw.studentid
 						AND reg.status = 'registered');
 				ELSE
 				END IF;
