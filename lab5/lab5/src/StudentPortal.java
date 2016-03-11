@@ -79,6 +79,7 @@ public class StudentPortal {
      */
     static void getInformation(Connection conn, String student) throws SQLException
     {
+        //Defining this query further down.
         String positionQuery = "";
 
         String studentQuery = "SELECT name,spname FROM studentsfollowing WHERE id = '"+student+"'";
@@ -102,7 +103,7 @@ public class StudentPortal {
         ResultSet res = myStatement.executeQuery(studentQuery);
         ResultSet res2;
 
-
+        //First clause
         if(res.next()) {
             System.out.print("Information for student " + student.substring(0, 6) + "-" + student.substring(6) + "\n");
             System.out.println("------------------");
@@ -113,6 +114,7 @@ public class StudentPortal {
 
         res = myStatement.executeQuery(branchQuery);
         if(res.next()) {
+            //if no branch exists
             if(res.getString(1) == null){
                 System.out.println("Branch: Have none");
             }else {
@@ -121,6 +123,7 @@ public class StudentPortal {
             res.close();
         }
 
+        //Second clause
         System.out.print("\nRead Courses (name (code), credits : grade): \n");
         res = myStatement.executeQuery(readCoursesQuery);
 
@@ -132,10 +135,11 @@ public class StudentPortal {
 
         res = myStatement.executeQuery(registeredCoursesQuery);
 
-
+        //third clause
         System.out.print("\nRegistered Courses (name (code), credits : status):\n");
 
         while(res.next()){
+            //getting the position if the student is waiting for the selected course
             if(res.getString(3).equals("waiting")){
                 String s = res.getString(2);
                 positionQuery = "SELECT cqp.position FROM coursequeuepositions AS cqp, Course AS c WHERE cqp.studentid = '" + student + "' AND cqp.coursecode = '" + s + "'";
@@ -157,7 +161,7 @@ public class StudentPortal {
         mS.close();
 
         res = myStatement.executeQuery(pathToGradQuery);
-
+        //fourth clause
         if(res.next()) {
             System.out.print("\nSeminar courses taken: " +res.getString(1)+ "\nMath credits taken: "+res.getString(2)+
                     "\nResearch credits taken: "+res.getString(3)+"\nTotal credits taken: "+res.getString(4)+
