@@ -98,9 +98,6 @@ public class StudentPortal {
                 "WHERE ptg.id = ?";
 
 
-        //Statement myStatement = conn.createStatement();
-        //Statement mS = conn.createStatement();
-
         PreparedStatement ps = conn.prepareStatement(studentQuery);
         ps.setString(1,student);
 
@@ -169,11 +166,7 @@ public class StudentPortal {
                 System.out.print(res.getString(1)+" ("+res.getString(2)+"): "+ res.getString(3)+"\n");
 
             }
-
-
-
         }
-
         res.close();
 
         ps = conn.prepareStatement(pathToGradQuery);
@@ -197,16 +190,16 @@ public class StudentPortal {
          */
     static void registerStudent(Connection conn, String student, String course)
             throws SQLException {
-//        String registerStudentStr = "INSERT INTO Registrations (coursecode, studentid) VALUES ('"+course+"','"+student+"')";
+
 
         try {
             PreparedStatement registerStudentStm=conn.prepareStatement("INSERT INTO Registrations (coursecode, studentid) VALUES (?,?)");
             registerStudentStm.setString(1,course);
             registerStudentStm.setString(2,student);
-//            PreparedStatement registerStudentStm = conn.prepareStatement(registerStudentStr);
+
             registerStudentStm.executeUpdate();
             registerStudentStm.close();
-//            String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
+
             PreparedStatement getCourseStm = conn.prepareStatement("SELECT coursename FROM course WHERE code=?");
             getCourseStm.setString(1,course);
             ResultSet rs = getCourseStm.executeQuery();
@@ -233,18 +226,15 @@ public class StudentPortal {
     static void unregisterStudent(Connection conn, String student, String course)
 
             throws SQLException {
-//        String unregStudentStr = "DELETE FROM registrations WHERE studentid = '" + student + "' AND coursecode = '" + course + "';";
 
         try {
             PreparedStatement unregStudentStm=conn.prepareStatement("DELETE FROM registrations WHERE studentid = ? AND coursecode = ?");
             unregStudentStm.setString(1,student);
             unregStudentStm.setString(2,course);
 
-//            PreparedStatement unregStudentStm = conn.prepareStatement(unregStudentStr);
             unregStudentStm.executeUpdate();
             unregStudentStm.close();
 
-//            String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
             PreparedStatement getCourseStm = conn.prepareStatement("SELECT coursename FROM course WHERE code= ?");
             getCourseStm.setString(1,course);
             ResultSet rs = getCourseStm.executeQuery();
