@@ -174,21 +174,25 @@ public class StudentPortal {
 
 
     /* Register: Given a student id number and a course code, this function
-     * should try to register the student for that course.
-     */
+         * should try to register the student for that course.
+         */
     static void registerStudent(Connection conn, String student, String course)
             throws SQLException {
-        String registerStudentStr = "INSERT INTO Registrations (coursecode, studentid) VALUES ('"+course+"','"+student+"')";
+//        String registerStudentStr = "INSERT INTO Registrations (coursecode, studentid) VALUES ('"+course+"','"+student+"')";
 
         try {
-            PreparedStatement registerStudentStm = conn.prepareStatement(registerStudentStr);
+            PreparedStatement registerStudentStm=conn.prepareStatement("INSERT INTO Registrations (coursecode, studentid) VALUES (?,?)");
+            registerStudentStm.setString(1,course);
+            registerStudentStm.setString(2,student);
+//            PreparedStatement registerStudentStm = conn.prepareStatement(registerStudentStr);
             registerStudentStm.executeUpdate();
             registerStudentStm.close();
-            String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
-            Statement getCourseStm = conn.createStatement();
-            ResultSet rs = getCourseStm.executeQuery(getCourseNameStr);
+//            String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
+            PreparedStatement getCourseStm = conn.prepareStatement("SELECT coursename FROM course WHERE code=?");
+            getCourseStm.setString(1,course);
+            ResultSet rs = getCourseStm.executeQuery();
             if(rs.next()) {
-                System.out.println("You are now successfully registered to course "+course+" "+rs.getString(1)+"!");
+                System.out.println("You are now successfully registered or put to the waiting list to course "+course+" "+rs.getString(1)+"!");
 
             }
             rs.close();
@@ -205,23 +209,28 @@ public class StudentPortal {
 
 
     /* Unregister: Given a student id number and a course code, this function
-     * should unregister the student from that course.
-     */
+         * should unregister the student from that course.
+         */
     static void unregisterStudent(Connection conn, String student, String course)
 
             throws SQLException {
-        String unregStudentStr = "DELETE FROM registrations WHERE studentid = '" + student + "' AND coursecode = '" + course + "';";
+//        String unregStudentStr = "DELETE FROM registrations WHERE studentid = '" + student + "' AND coursecode = '" + course + "';";
 
         try {
-            PreparedStatement unregStudentStm = conn.prepareStatement(unregStudentStr);
+            PreparedStatement unregStudentStm=conn.prepareStatement("DELETE FROM registrations WHERE studentid = ? AND coursecode = ?");
+            unregStudentStm.setString(1,student);
+            unregStudentStm.setString(2,course);
+
+//            PreparedStatement unregStudentStm = conn.prepareStatement(unregStudentStr);
             unregStudentStm.executeUpdate();
             unregStudentStm.close();
 
-            String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
-            Statement getCourseStm = conn.createStatement();
-            ResultSet rs = getCourseStm.executeQuery(getCourseNameStr);
+//            String getCourseNameStr = "SELECT coursename FROM course WHERE code='" + course + "'";
+            PreparedStatement getCourseStm = conn.prepareStatement("SELECT coursename FROM course WHERE code= ?");
+            getCourseStm.setString(1,course);
+            ResultSet rs = getCourseStm.executeQuery();
             if (rs.next()) {
-                System.out.println("You are now successfully unregistered from course " + course + " " + rs.getString(1) + "!");
+                System.out.println("You are now successfully unregistered or deleted from the waiting list from course " + course + " " + rs.getString(1) + "!");
 
             }
 
