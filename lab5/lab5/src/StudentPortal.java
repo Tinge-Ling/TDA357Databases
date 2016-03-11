@@ -82,25 +82,29 @@ public class StudentPortal {
         //Defining this query further down.
         String positionQuery = "";
 
-        String studentQuery = "SELECT name,spname FROM studentsfollowing WHERE id = '"+student+"'";
+        String studentQuery = "SELECT name,spname FROM studentsfollowing WHERE id = ?";
 
-        String branchQuery = "SELECT bname FROM studentsfollowing WHERE id = '"+student+"'";
+        String branchQuery = "SELECT bname FROM studentsfollowing WHERE id = ?";
 
         String readCoursesQuery = "SELECT c.coursename,c.code,fc.grade,fc.creditpoints FROM Course AS c, finishedcourses AS fc " +
-                "WHERE fc.id = '"+student+"' AND fc.coursecode = c.code";
+                "WHERE fc.id = ? AND fc.coursecode = c.code";
 
         String registeredCoursesQuery = "SELECT c.coursename,c.code,reg.status FROM Course AS c, registrations AS reg " +
-                "WHERE reg.studentid = '"+student+"' AND reg.coursecode = c.code";
+                "WHERE reg.studentid = ? AND reg.coursecode = c.code";
 
         String pathToGradQuery = "SELECT ptg.nbrofseminar, ptg.mathcredits, ptg.researchcredits, ptg.totalcreditpoints, " +
                 "ptg.isqualifiedtograduate " +
                 "FROM pathtograduation AS ptg " +
-                "WHERE ptg.id = '"+student+"'";
+                "WHERE ptg.id = ?";
 
 
-        Statement myStatement = conn.createStatement();
-        Statement mS = conn.createStatement();
-        ResultSet res = myStatement.executeQuery(studentQuery);
+        //Statement myStatement = conn.createStatement();
+        //Statement mS = conn.createStatement();
+
+        PreparedStatement ps = conn.prepareStatement(studentQuery);
+        ps.setString(1,student);
+
+        ResultSet res = ps.executeQuery();
         ResultSet res2;
 
         //First clause
@@ -112,7 +116,10 @@ public class StudentPortal {
             res.close();
         }
 
-        res = myStatement.executeQuery(branchQuery);
+        ps = conn.prepareStatement(branchQuery);
+        ps.setString(1,student);
+        res = ps.executeQuery();
+
         if(res.next()) {
             //if no branch exists
             if(res.getString(1) == null){
@@ -123,9 +130,11 @@ public class StudentPortal {
             res.close();
         }
 
+        ps = conn.prepareStatement(readCoursesQuery);
+        ps.setString(1,student);
+        res = ps.executeQuery();
         //Second clause
         System.out.print("\nRead Courses (name (code), credits : grade): \n");
-        res = myStatement.executeQuery(readCoursesQuery);
 
         while(res.next()){
             System.out.print(res.getString(1)+" ("+res.getString(2)+"), "+ res.getString(4)+"p: " +res.getString(3)+"\n");
@@ -133,7 +142,9 @@ public class StudentPortal {
         }
         res.close();
 
-        res = myStatement.executeQuery(registeredCoursesQuery);
+        ps = conn.prepareStatement(registeredCoursesQuery);
+        ps.setString(1,student);
+        res = ps.executeQuery();
 
         //third clause
         System.out.print("\nRegistered Courses (name (code), credits : status):\n");
@@ -142,12 +153,17 @@ public class StudentPortal {
             //getting the position if the student is waiting for the selected course
             if(res.getString(3).equals("waiting")){
                 String s = res.getString(2);
-                positionQuery = "SELECT cqp.position FROM coursequeuepositions AS cqp, Course AS c WHERE cqp.studentid = '" + student + "' AND cqp.coursecode = '" + s + "'";
-                res2 = mS.executeQuery(positionQuery);
+                positionQuery = "SELECT cqp.position FROM coursequeuepositions AS cqp, Course AS c WHERE cqp.studentid = ? AND cqp.coursecode = '" + s + "'";
+
+                PreparedStatement prepstate = conn.prepareStatement(positionQuery);
+                prepstate.setString(1,student);
+                res2 = prepstate.executeQuery();
+
                 if(res2.next()){
                     System.out.print(res.getString(1)+" ("+res.getString(2)+"): "+ res.getString(3)+" as nr "+ res2.getString(1)+"\n");
 
                 }
+                prepstate.close();
                 res2.close();
             }else {
                 System.out.print(res.getString(1)+" ("+res.getString(2)+"): "+ res.getString(3)+"\n");
@@ -155,12 +171,15 @@ public class StudentPortal {
             }
 
 
+
         }
 
         res.close();
-        mS.close();
 
-        res = myStatement.executeQuery(pathToGradQuery);
+        ps = conn.prepareStatement(pathToGradQuery);
+        ps.setString(1,student);
+        res = ps.executeQuery();
+
         //fourth clause
         if(res.next()) {
             System.out.print("\nSeminar courses taken: " +res.getString(1)+ "\nMath credits taken: "+res.getString(2)+
@@ -169,7 +188,7 @@ public class StudentPortal {
 
         }
         res.close();
-        myStatement.close();
+        ps.close();
     }
 
 
